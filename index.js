@@ -22,48 +22,43 @@ const subject = 'Frontend application';
 const emailContentTemplate = `
 <div>
   <div>
-    Dear [Company Name]
+    Dear [clientName]
   </div>
   <div>
-    My name is Ebrahim Ramadan and I am a sophomore computer science student
-    at E-JUST. As a web developer, I am seeking a junior-level position in a
-    space that allows me to expand my skills and learn about software
-    development.
+  You've got great taste! We're thrilled you chose RIVO.
   </div>
   <div>
-    The work [Company Name] is doing is exactly the work I want to be part of. That
-    is why I am applying for the position of Front-end developer. I look
-    forward to hearing from you soon.
+  Your order, [orderID], is now under our care and is being processed by our crew.
   </div>
-  <div>Thank you,</div>
-  <div>Ebrahim Ramadan</div>
+  <div>We'll notify you by email when your items are dispatched and ready for delivery. For precise delivery dates or to track and manage your order, please check your 'Order Summary'.</div>
+  <a href='https://e-commerce-myass.vercel.app/orders'>View Order Summary</a>
 </div>
 `;
 
 app.post('/send-email', (req, res) => {
-  const { email, companyName } = req.body;
+  const { email, orderID, clientName } = req.body;
 
-  if (!email || !companyName) {
-    return res.status(400).json({ error: 'Email and company name are required' });
+  if (!email || !clientName || !orderID) {
+    return res.status(400).json({ error: 'Email, orderID, and clientName are required' });
   }
 
-  const emailContent = emailContentTemplate.replace(/\[Company Name\]/g, companyName);
+  let emailContent = emailContentTemplate.replace(/\[clientName\]/g, clientName);
+  emailContent = emailContent.replace(/\[orderID\]/g, orderID);
 
   const mailOptions = {
     from: 'ramadanebrahim791@gmail.com',
     to: email,
     subject: subject,
     html: emailContent,
-    attachments: [{ filename: 'resume.pdf', content: resumeFile }],
   };
 
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
-      console.error(`Error sending email to ${companyName}: ${error}`);
+      console.error(`Error sending email to ${email}: ${error}`);
       return res.status(500).json({ error: 'Error sending email' });
     } else {
-      console.log(`Email sent to ${companyName}: ${info.response}`);
-      return res.status(200).json({ message: `Email sent to ${companyName}` });
+      console.log(`Email sent to ${email}: ${info.response}`);
+      return res.status(200).json({ message: `Email sent to ${email}` });
     }
   });
 });
