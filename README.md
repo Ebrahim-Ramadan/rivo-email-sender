@@ -1,0 +1,1 @@
+just an endpoint for sending confirmation emails for customers after buying items from [RIVO](https://e-commerce-myass.vercel.app/)
