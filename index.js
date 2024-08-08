@@ -1,10 +1,11 @@
+require('dotenv').config();
 const express = require('express');
 const nodemailer = require('nodemailer');
 const fs = require('fs');
 const bodyParser = require('body-parser');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 
@@ -12,13 +13,12 @@ app.use(bodyParser.json());
 const transporter = nodemailer.createTransport({
   service: 'Gmail',
   auth: {
-    user: 'ramadanebrahim791@gmail.com', // Your Gmail address
-    pass: 'your Application-specific password here', // Your Application-specific password 
+    user: process.env.Gmail_ACC, // Your Gmail address
+    pass: process.env.apppassword, // Your Application-specific password 
   },
 });
 
-const resumeFile = fs.readFileSync('./my resume.pdf');
-const subject = 'Frontend application';
+const subject = 'Order Confirmation | Rivo Gallery';
 const emailContentTemplate = `
 <div>
   <div>
@@ -31,11 +31,13 @@ const emailContentTemplate = `
   Your order, [orderID], is now under our care and is being processed by our crew.
   </div>
   <div>We'll notify you by email when your items are dispatched and ready for delivery. For precise delivery dates or to track and manage your order, please check your 'Order Summary'.</div>
-  <a href='https://e-commerce-myass.vercel.app/orders'>View Order Summary</a>
+  <a href='https://e-commerce-myass.vercel.app/orders?id=[orderID]'>View Order Summary</a>
 </div>
 `;
 
 app.post('/send-email', (req, res) => {
+  console.log('process.env.apppassword', process.env.apppassword);
+  console.log('req.body', req.body);
   const { email, orderID, clientName } = req.body;
 
   if (!email || !clientName || !orderID) {
@@ -46,7 +48,7 @@ app.post('/send-email', (req, res) => {
   emailContent = emailContent.replace(/\[orderID\]/g, orderID);
 
   const mailOptions = {
-    from: 'ramadanebrahim791@gmail.com',
+    from: process.env.Gmail_ACC,
     to: email,
     subject: subject,
     html: emailContent,
